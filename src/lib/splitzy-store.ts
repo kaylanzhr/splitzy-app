@@ -80,7 +80,7 @@ const seed = (): Store => {
       },
     ],
     activeGroupId: groupId,
-    settings: { n8nWebhookUrl: "" },
+    settings: {},
   };
 };
 
