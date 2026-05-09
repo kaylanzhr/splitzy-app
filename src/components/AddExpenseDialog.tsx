@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { actions, type Group } from "@/lib/splitzy-store";
+import { actions, formatThousands, parseThousands, type Expense, type Group } from "@/lib/splitzy-store";
 import {
   Select,
   SelectContent,
@@ -26,58 +26,88 @@ export function AddExpenseDialog({
   open,
   onOpenChange,
   group,
+  expense,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   group: Group;
+  expense?: Expense | null;
 }) {
+  const isEdit = !!expense;
   const [desc, setDesc] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(""); // formatted display string
   const [emoji, setEmoji] = useState("💸");
   const [paidBy, setPaidBy] = useState(group.members[0]?.id || "");
   const [splitWith, setSplitWith] = useState<string[]>(group.members.map((m) => m.id));
 
   useEffect(() => {
     if (open) {
-      setDesc("");
-      setAmount("");
-      setEmoji("💸");
-      setPaidBy(group.members[0]?.id || "");
-      setSplitWith(group.members.map((m) => m.id));
+      if (expense) {
+        setDesc(expense.description);
+        setAmount(formatThousands(String(Math.round(expense.amount))));
+        setEmoji(expense.emoji || "💸");
+        setPaidBy(expense.paidBy);
+        setSplitWith(expense.splitWith);
+      } else {
+        setDesc("");
+        setAmount("");
+        setEmoji("💸");
+        setPaidBy(group.members[0]?.id || "");
+        setSplitWith(group.members.map((m) => m.id));
+      }
     }
-  }, [open, group.id]);
+  }, [open, group.id, expense]);
 
   function submit() {
-    const amt = parseFloat(amount);
+    const amt = parseThousands(amount);
     if (!desc.trim() || !amt || splitWith.length === 0 || !paidBy) return;
-    actions.addExpense({
-      groupId: group.id,
-      description: desc.trim(),
-      amount: amt,
-      paidBy,
-      splitWith,
-      emoji,
-    });
+    if (isEdit && expense) {
+      actions.updateExpense(expense.id, {
+        description: desc.trim(),
+        amount: amt,
+        paidBy,
+        splitWith,
+        emoji,
+      });
+    } else {
+      actions.addExpense({
+        groupId: group.id,
+        description: desc.trim(),
+        amount: amt,
+        paidBy,
+        splitWith,
+        emoji,
+      });
+    }
     onOpenChange(false);
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-3xl">
+      <DialogContent className="sm:max-w-md rounded-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl">Add an expense</DialogTitle>
-          <DialogDescription>Who paid? Who's splitting?</DialogDescription>
+          <DialogTitle className="font-display text-2xl">
+            {isEdit ? "Edit expense" : "Add an expense"}
+          </DialogTitle>
+          <DialogDescription>
+            {isEdit ? "Fix any typos or update the split." : "Who paid? Who's splitting?"}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="flex gap-2">
             <div className="flex-1 space-y-1.5">
               <Label>Description</Label>
-              <Input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Tapas dinner" />
+              <Input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Seafood dinner" />
             </div>
-            <div className="w-28 space-y-1.5">
-              <Label>Amount</Label>
-              <Input type="number" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" />
+            <div className="w-36 space-y-1.5">
+              <Label>Amount (Rp)</Label>
+              <Input
+                inputMode="numeric"
+                value={amount}
+                onChange={(e) => setAmount(formatThousands(e.target.value))}
+                placeholder="0"
+              />
             </div>
           </div>
 
@@ -141,7 +171,7 @@ export function AddExpenseDialog({
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button onClick={submit} className="bg-gradient-warm text-primary-foreground rounded-full px-6">
-            Add expense
+            {isEdit ? "Save changes" : "Add expense"}
           </Button>
         </DialogFooter>
       </DialogContent>
