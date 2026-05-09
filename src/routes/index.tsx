@@ -1,26 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Landing } from "@/components/Landing";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  component: Landing,
+  head: () => ({
+    meta: [
+      { title: "Splitzy — Split smarter, stay closer." },
+      {
+        name: "description",
+        content:
+          "The friendliest way for friends, trip groups, and flatmates to split bills and balance shared expenses. Now with n8n auto-summaries.",
+      },
+      { property: "og:title", content: "Splitzy — Split smarter, stay closer." },
+      {
+        property: "og:description",
+        content:
+          "Modern, warm, and fun split-bill app for your crew. Auto-send summaries via n8n.",
+      },
+    ],
+  }),
 });
-
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
-
-function Index() {
-  return <PlaceholderIndex />;
-}
