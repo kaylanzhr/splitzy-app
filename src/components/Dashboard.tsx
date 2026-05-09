@@ -3,10 +3,10 @@ import { Logo } from "@/components/Logo";
 import { Link } from "@tanstack/react-router";
 import { actions, computeBalances, settleUp, useStore, type Group } from "@/lib/splitzy-store";
 import { Button } from "@/components/ui/button";
-import { Plus, Settings, Trash2, ChevronDown, Send, Users, Sparkles } from "lucide-react";
+import { Plus, Trash2, ChevronDown, Send, Users, Sparkles } from "lucide-react";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 import { NewGroupDialog } from "./NewGroupDialog";
-import { SettingsDialog } from "./SettingsDialog";
+import { SendSummaryDialog } from "./SendSummaryDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,13 +14,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
 
 export function Dashboard() {
   const store = useStore();
   const [addOpen, setAddOpen] = useState(false);
   const [newGroupOpen, setNewGroupOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(false);
 
   const group: Group | undefined =
     store.groups.find((g) => g.id === store.activeGroupId) || store.groups[0];
@@ -36,39 +35,6 @@ export function Dashboard() {
   const youId = group?.members.find((m) => m.name === "You")?.id;
   const yourBalance = youId ? balances[youId] || 0 : 0;
 
-  async function sendSummary() {
-    if (!group) return;
-    const url = store.settings.n8nWebhookUrl;
-    if (!url) {
-      toast.error("Add your n8n webhook URL in Settings first.");
-      setSettingsOpen(true);
-      return;
-    }
-    const payload = {
-      group: `${group.name} ${group.emoji}`,
-      total,
-      currency: group.currency,
-      generated_at: new Date().toISOString(),
-      balances: group.members.map((m) => ({
-        name: m.name,
-        emoji: m.emoji,
-        amount: Number((balances[m.id] || 0).toFixed(2)),
-      })),
-      settle_up: txns.map((t) => `${t.from.name} → ${t.to.name}: ${group.currency}${t.amount.toFixed(2)}`),
-    };
-    try {
-      await fetch(url, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      toast.success("Summary sent to n8n! 🚀");
-    } catch {
-      toast.error("Couldn't reach the webhook. Double-check your URL.");
-    }
-  }
-
   if (!group) return null;
 
   return (
@@ -77,9 +43,6 @@ export function Dashboard() {
       <header className="container mx-auto flex items-center justify-between gap-4 px-6 py-6">
         <Logo />
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setSettingsOpen(true)}>
-            <Settings className="h-5 w-5" />
-          </Button>
           <Link to="/">
             <Button variant="ghost" className="rounded-full text-sm">Home</Button>
           </Link>
@@ -104,19 +67,25 @@ export function Dashboard() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-64">
               {store.groups.map((g) => (
-                <DropdownMenuItem key={g.id} onClick={() => actions.setActiveGroup(g.id)} className="gap-2 py-2">
+                <DropdownMenuItem key={g.id} onSelect={() => actions.setActiveGroup(g.id)} className="gap-2 py-2">
                   <span className="text-lg">{g.emoji}</span> {g.name}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setNewGroupOpen(true)} className="gap-2">
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setTimeout(() => setNewGroupOpen(true), 0);
+                }}
+                className="gap-2"
+              >
                 <Plus className="h-4 w-4" /> New group
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           <div className="flex gap-2">
-            <Button variant="outline" className="rounded-full" onClick={sendSummary}>
+            <Button variant="outline" className="rounded-full" onClick={() => setSummaryOpen(true)}>
               <Send className="h-4 w-4 mr-1.5" /> Send summary
             </Button>
             <Button className="rounded-full bg-gradient-warm text-primary-foreground shadow-soft" onClick={() => setAddOpen(true)}>
@@ -229,7 +198,7 @@ export function Dashboard() {
 
       <AddExpenseDialog open={addOpen} onOpenChange={setAddOpen} group={group} />
       <NewGroupDialog open={newGroupOpen} onOpenChange={setNewGroupOpen} />
-      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} settings={store.settings} />
+      <SendSummaryDialog open={summaryOpen} onOpenChange={setSummaryOpen} group={group} />
     </div>
   );
 }
