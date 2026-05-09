@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { actions, computeBalances, settleUp, useStore, type Group } from "@/lib/splitzy-store";
+import { actions, computeBalances, formatMoney, settleUp, useStore, type Group } from "@/lib/splitzy-store";
 import { Send, Mail } from "lucide-react";
 import { toast } from "sonner";
 
@@ -34,7 +34,10 @@ export function SendSummaryDialog({
     }
   }, [open, group.id, group.members]);
 
-  const balances = useMemo(() => computeBalances(group, store.expenses), [group, store.expenses]);
+  const balances = useMemo(
+    () => computeBalances(group, store.expenses, store.payments),
+    [group, store.expenses, store.payments],
+  );
   const txns = useMemo(() => settleUp(balances, group.members), [balances, group]);
   const total = store.expenses
     .filter((e) => e.groupId === group.id)
@@ -44,13 +47,13 @@ export function SendSummaryDialog({
     const lines: string[] = [];
     lines.push(`Hi! Here's the latest ${group.name} ${group.emoji} summary.`);
     lines.push("");
-    lines.push(`Total spent: ${group.currency}${total.toFixed(2)}`);
+    lines.push(`Total spent: ${formatMoney(total, group.currency)}`);
     lines.push("");
     lines.push("Balances:");
     group.members.forEach((m) => {
       const b = balances[m.id] || 0;
       const sign = b > 0.01 ? "is owed" : b < -0.01 ? "owes" : "is settled";
-      lines.push(`  ${m.emoji} ${m.name} — ${sign} ${group.currency}${Math.abs(b).toFixed(2)}`);
+      lines.push(`  ${m.emoji} ${m.name} — ${sign} ${formatMoney(Math.abs(b), group.currency)}`);
     });
     lines.push("");
     if (txns.length === 0) {
@@ -58,7 +61,7 @@ export function SendSummaryDialog({
     } else {
       lines.push("Suggested settle-up:");
       txns.forEach((t) => {
-        lines.push(`  ${t.from.name} → ${t.to.name}: ${group.currency}${t.amount.toFixed(2)}`);
+        lines.push(`  ${t.from.name} → ${t.to.name}: ${formatMoney(t.amount, group.currency)}`);
       });
     }
     lines.push("");
