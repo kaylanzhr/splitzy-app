@@ -19,9 +19,7 @@ export type Group = {
   currency: string;
 };
 
-export type Settings = {
-  n8nWebhookUrl: string;
-};
+export type Settings = Record<string, never>;
 
 const KEY = "splitzy:v1";
 
