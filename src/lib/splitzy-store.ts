@@ -11,6 +11,15 @@ export type Expense = {
   date: string;
   emoji?: string;
 };
+export type Payment = {
+  id: string;
+  groupId: string;
+  fromId: string;
+  toId: string;
+  amount: number;
+  date: string;
+  note?: string;
+};
 export type Group = {
   id: string;
   name: string;
@@ -21,14 +30,32 @@ export type Group = {
 
 export type Settings = Record<string, never>;
 
-const KEY = "splitzy:v1";
+const KEY = "splitzy:v2";
+const LEGACY_KEY = "splitzy:v1";
 
 type Store = {
   groups: Group[];
   expenses: Expense[];
+  payments: Payment[];
   activeGroupId: string;
   settings: Settings;
 };
+
+export function formatMoney(amount: number, currency = "Rp ") {
+  const rounded = Math.round(amount);
+  return `${currency}${new Intl.NumberFormat("id-ID").format(rounded)}`;
+}
+
+/** Strip to digits and re-format with Indonesian thousand separators (dots). */
+export function formatThousands(raw: string) {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return "";
+  return new Intl.NumberFormat("id-ID").format(parseInt(digits, 10));
+}
+export function parseThousands(raw: string) {
+  const digits = raw.replace(/\D/g, "");
+  return digits ? parseInt(digits, 10) : 0;
+}
 
 const seed = (): Store => {
   const m = (n: string, e: string): Member => ({ id: crypto.randomUUID(), name: n, emoji: e });
@@ -41,9 +68,9 @@ const seed = (): Store => {
     groups: [
       {
         id: groupId,
-        name: "Lisbon Trip",
+        name: "Bali Trip",
         emoji: "🌊",
-        currency: "€",
+        currency: "Rp ",
         members: [you, alex, sam, jules],
       },
     ],
@@ -51,8 +78,8 @@ const seed = (): Store => {
       {
         id: crypto.randomUUID(),
         groupId,
-        description: "Airbnb 3 nights",
-        amount: 480,
+        description: "Villa 3 nights",
+        amount: 4_800_000,
         paidBy: you.id,
         splitWith: [you.id, alex.id, sam.id, jules.id],
         date: new Date(Date.now() - 86400000 * 2).toISOString(),
@@ -61,24 +88,25 @@ const seed = (): Store => {
       {
         id: crypto.randomUUID(),
         groupId,
-        description: "Tapas dinner",
-        amount: 86,
+        description: "Seafood dinner",
+        amount: 860_000,
         paidBy: alex.id,
         splitWith: [you.id, alex.id, sam.id, jules.id],
         date: new Date(Date.now() - 86400000).toISOString(),
-        emoji: "🍷",
+        emoji: "🍤",
       },
       {
         id: crypto.randomUUID(),
         groupId,
         description: "Surf lesson",
-        amount: 120,
+        amount: 1_200_000,
         paidBy: sam.id,
         splitWith: [you.id, sam.id, jules.id],
         date: new Date().toISOString(),
         emoji: "🏄",
       },
     ],
+    payments: [],
     activeGroupId: groupId,
     settings: {},
   };
@@ -88,12 +116,28 @@ function load(): Store {
   if (typeof window === "undefined") return seed();
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) {
-      const s = seed();
-      localStorage.setItem(KEY, JSON.stringify(s));
-      return s;
+    if (raw) {
+      const parsed = JSON.parse(raw) as Store;
+      if (!parsed.payments) parsed.payments = [];
+      // Force IDR currency on all groups
+      parsed.groups = parsed.groups.map((g) => ({ ...g, currency: "Rp " }));
+      return parsed;
     }
-    return JSON.parse(raw);
+    // Migrate from v1 if present
+    const legacy = localStorage.getItem(LEGACY_KEY);
+    if (legacy) {
+      const old = JSON.parse(legacy);
+      const migrated: Store = {
+        ...old,
+        payments: [],
+        groups: (old.groups || []).map((g: Group) => ({ ...g, currency: "Rp " })),
+      };
+      localStorage.setItem(KEY, JSON.stringify(migrated));
+      return migrated;
+    }
+    const s = seed();
+    localStorage.setItem(KEY, JSON.stringify(s));
+    return s;
   } catch {
     return seed();
   }
@@ -135,9 +179,8 @@ export const actions = {
         emoji: emojis[i % emojis.length],
         email: m.email?.trim() || undefined,
       }));
-    // Always include "You"
     members.unshift({ id: crypto.randomUUID(), name: "You", emoji: "😎", email: yourEmail?.trim() || undefined });
-    const g: Group = { id: crypto.randomUUID(), name, emoji, currency: "€", members };
+    const g: Group = { id: crypto.randomUUID(), name, emoji, currency: "Rp ", members };
     setStore((s) => ({ ...s, groups: [...s.groups, g], activeGroupId: g.id }));
     return g;
   },
@@ -158,15 +201,28 @@ export const actions = {
     const exp: Expense = { ...e, id: crypto.randomUUID(), date: new Date().toISOString() };
     setStore((s) => ({ ...s, expenses: [exp, ...s.expenses] }));
   },
+  updateExpense(id: string, patch: Partial<Omit<Expense, "id" | "groupId">>) {
+    setStore((s) => ({
+      ...s,
+      expenses: s.expenses.map((e) => (e.id === id ? { ...e, ...patch } : e)),
+    }));
+  },
   deleteExpense(id: string) {
     setStore((s) => ({ ...s, expenses: s.expenses.filter((e) => e.id !== id) }));
+  },
+  addPayment(p: Omit<Payment, "id" | "date">) {
+    const pay: Payment = { ...p, id: crypto.randomUUID(), date: new Date().toISOString() };
+    setStore((s) => ({ ...s, payments: [pay, ...s.payments] }));
+  },
+  deletePayment(id: string) {
+    setStore((s) => ({ ...s, payments: s.payments.filter((p) => p.id !== id) }));
   },
   saveSettings(settings: Settings) {
     setStore((s) => ({ ...s, settings }));
   },
 };
 
-export function computeBalances(group: Group, expenses: Expense[]) {
+export function computeBalances(group: Group, expenses: Expense[], payments: Payment[] = []) {
   const balances: Record<string, number> = {};
   group.members.forEach((m) => (balances[m.id] = 0));
   expenses
@@ -177,6 +233,13 @@ export function computeBalances(group: Group, expenses: Expense[]) {
       e.splitWith.forEach((mid) => {
         balances[mid] = (balances[mid] || 0) - share;
       });
+    });
+  // Payments: when "from" pays "to", from's debt decreases (+), to's credit decreases (-)
+  payments
+    .filter((p) => p.groupId === group.id)
+    .forEach((p) => {
+      balances[p.fromId] = (balances[p.fromId] || 0) + p.amount;
+      balances[p.toId] = (balances[p.toId] || 0) - p.amount;
     });
   return balances;
 }
