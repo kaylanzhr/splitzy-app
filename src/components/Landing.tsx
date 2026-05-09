@@ -12,7 +12,7 @@ export function Landing() {
         <nav className="hidden gap-8 text-sm font-medium text-muted-foreground md:flex">
           <a href="#features" className="hover:text-foreground transition-colors">Features</a>
           <a href="#how" className="hover:text-foreground transition-colors">How it works</a>
-          <a href="#automation" className="hover:text-foreground transition-colors">Automation</a>
+          <a href="#automation" className="hover:text-foreground transition-colors">Notifications</a>
         </nav>
         <Link to="/app">
           <Button variant="default" className="rounded-full px-5 shadow-soft">
@@ -26,7 +26,7 @@ export function Landing() {
         <div className="space-y-7">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-1.5 text-xs font-semibold text-muted-foreground backdrop-blur">
             <Sparkles className="h-3.5 w-3.5 text-primary" />
-            Now with n8n auto-summaries
+            Now with auto-summary emails
           </div>
           <h1 className="font-display text-5xl font-extrabold leading-[1.05] tracking-tight md:text-7xl">
             Split smarter,
@@ -106,7 +106,7 @@ export function Landing() {
             {[
               { n: "01", t: "Create a group", d: "Name it, pick an emoji, add your people." },
               { n: "02", t: "Drop in expenses", d: "Each time someone pays, log it. Splitzy does the rest." },
-              { n: "03", t: "Get the summary", d: "See balances, settle up, ping the group via n8n." },
+              { n: "03", t: "Get the summary", d: "See balances, settle up, email the group in one tap." },
             ].map((s) => (
               <div key={s.n} className="space-y-3">
                 <div className="font-display text-5xl font-extrabold text-gradient-warm">{s.n}</div>
@@ -123,18 +123,18 @@ export function Landing() {
         <div className="grid gap-10 md:grid-cols-2 items-center">
           <div className="space-y-5">
             <div className="inline-flex items-center gap-2 rounded-full bg-mint/40 px-3 py-1 text-xs font-semibold text-mint-foreground">
-              <Zap className="h-3.5 w-3.5" /> n8n powered
+              <Zap className="h-3.5 w-3.5" /> Email summaries
             </div>
-            <h2 className="font-display text-4xl font-bold md:text-5xl">Auto-summaries to your favorite app.</h2>
+            <h2 className="font-display text-4xl font-bold md:text-5xl">Auto-summaries straight to everyone's inbox.</h2>
             <p className="text-muted-foreground text-lg">
-              Plug in an n8n webhook URL and Splitzy will ship a beautiful balance summary
-              to Slack, Telegram, Discord, email — wherever your group hangs out.
+              Add an email for each member and Splitzy drafts a beautiful balance summary
+              ready to send — no chasing, no awkward reminders.
             </p>
             <ul className="space-y-2 text-sm">
               {[
-                "Trigger on demand from the dashboard",
-                "Send weekly digests via n8n schedule",
-                "Zero-config — just paste a webhook URL",
+                "One-tap notifications to every member",
+                "Clean recap of who owes whom",
+                "Zero setup — just add emails and go",
               ].map((t) => (
                 <li key={t} className="flex items-center gap-2">
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-mint text-mint-foreground text-xs font-bold">✓</span>
@@ -154,23 +154,21 @@ export function Landing() {
                 <span className="h-3 w-3 rounded-full bg-destructive/80" />
                 <span className="h-3 w-3 rounded-full bg-sun" />
                 <span className="h-3 w-3 rounded-full bg-mint" />
-                <span className="ml-2 opacity-60">webhook payload</span>
+                <span className="ml-2 opacity-60">summary preview</span>
               </div>
-              <pre className="leading-relaxed opacity-90 whitespace-pre-wrap">{`{
-  "group": "Lisbon Trip 🌊",
-  "total": 686,
-  "currency": "€",
-  "balances": [
-    { "name": "Sam",  "owed":  82.50 },
-    { "name": "You",  "owed":  41.00 },
-    { "name": "Alex","owes": -38.20 },
-    { "name": "Jules","owes":-85.30 }
-  ],
-  "settle_up": [
-    "Jules → Sam: €82.50",
-    "Alex  → You: €38.20"
-  ]
-}`}</pre>
+              <pre className="leading-relaxed opacity-90 whitespace-pre-wrap">{`Lisbon Trip 🌊 — summary
+
+Total spent: €686.00
+
+Balances:
+  😎 You    is owed  €41.00
+  🦊 Alex   owes     €38.20
+  🐼 Sam    is owed  €82.50
+  🦄 Jules  owes     €85.30
+
+Settle up:
+  Jules → Sam: €82.50
+  Alex  → You: €38.20`}</pre>
             </div>
           </div>
         </div>
