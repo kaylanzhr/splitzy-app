@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,13 @@ import { X, Plus } from "lucide-react";
 
 const EMOJIS = ["🌊", "🏔️", "🏠", "🍕", "🎉", "✈️", "🎬", "🚗", "🎓", "💼"];
 
+type MemberInput = { name: string; email: string };
+
+const initialMembers = (): MemberInput[] => [
+  { name: "Alex", email: "" },
+  { name: "Sam", email: "" },
+];
+
 export function NewGroupDialog({
   open,
   onOpenChange,
@@ -24,33 +31,39 @@ export function NewGroupDialog({
 }) {
   const [name, setName] = useState("");
   const [emoji, setEmoji] = useState("🎉");
-  const [members, setMembers] = useState<string[]>(["Alex", "Sam"]);
-  const [newMember, setNewMember] = useState("");
+  const [yourEmail, setYourEmail] = useState("");
+  const [members, setMembers] = useState<MemberInput[]>(initialMembers());
 
-  function reset() {
-    setName("");
-    setEmoji("🎉");
-    setMembers(["Alex", "Sam"]);
-    setNewMember("");
+  useEffect(() => {
+    if (open) {
+      setName("");
+      setEmoji("🎉");
+      setYourEmail("");
+      setMembers(initialMembers());
+    }
+  }, [open]);
+
+  function addMember() {
+    setMembers((m) => [...m, { name: "", email: "" }]);
   }
 
-  function add() {
-    const t = newMember.trim();
-    if (!t) return;
-    setMembers((m) => [...m, t]);
-    setNewMember("");
+  function updateMember(i: number, patch: Partial<MemberInput>) {
+    setMembers((arr) => arr.map((m, idx) => (idx === i ? { ...m, ...patch } : m)));
+  }
+
+  function removeMember(i: number) {
+    setMembers((arr) => arr.filter((_, idx) => idx !== i));
   }
 
   function submit() {
     if (!name.trim()) return;
-    actions.addGroup(name.trim(), emoji, members.filter((m) => m.trim()));
-    reset();
+    actions.addGroup(name.trim(), emoji, members, yourEmail);
     onOpenChange(false);
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) reset(); }}>
-      <DialogContent className="sm:max-w-md rounded-3xl">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md rounded-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">New group</DialogTitle>
           <DialogDescription>A trip, a flatshare, a dinner club…</DialogDescription>
@@ -70,7 +83,9 @@ export function NewGroupDialog({
                   type="button"
                   key={e}
                   onClick={() => setEmoji(e)}
-                  className={`h-10 w-10 rounded-xl text-xl transition ${emoji === e ? "bg-primary/15 ring-2 ring-primary" : "bg-secondary hover:bg-accent"}`}
+                  className={`h-10 w-10 rounded-xl text-xl transition ${
+                    emoji === e ? "bg-primary/15 ring-2 ring-primary" : "bg-secondary hover:bg-accent"
+                  }`}
                 >
                   {e}
                 </button>
@@ -78,27 +93,49 @@ export function NewGroupDialog({
             </div>
           </div>
 
+          <div className="space-y-1.5">
+            <Label>Your email <span className="text-muted-foreground font-normal">(optional)</span></Label>
+            <Input
+              type="email"
+              value={yourEmail}
+              onChange={(e) => setYourEmail(e.target.value)}
+              placeholder="you@example.com"
+            />
+          </div>
+
           <div className="space-y-2">
-            <Label>Members <span className="text-muted-foreground font-normal">(You is added automatically)</span></Label>
-            <div className="flex gap-2">
-              <Input
-                value={newMember}
-                onChange={(e) => setNewMember(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }}
-                placeholder="Add a name"
-              />
-              <Button type="button" onClick={add} variant="secondary" className="rounded-full"><Plus className="h-4 w-4" /></Button>
-            </div>
-            <div className="flex flex-wrap gap-1.5 pt-1">
+            <Label>Members</Label>
+            <div className="space-y-2">
               {members.map((m, i) => (
-                <span key={i} className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm">
-                  {m}
-                  <button onClick={() => setMembers((arr) => arr.filter((_, idx) => idx !== i))}>
-                    <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                  </button>
-                </span>
+                <div key={i} className="flex gap-2 items-start">
+                  <Input
+                    value={m.name}
+                    onChange={(e) => updateMember(i, { name: e.target.value })}
+                    placeholder="Name"
+                    className="flex-1"
+                  />
+                  <Input
+                    type="email"
+                    value={m.email}
+                    onChange={(e) => updateMember(i, { email: e.target.value })}
+                    placeholder="email (optional)"
+                    className="flex-[1.3]"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeMember(i)}
+                    className="rounded-full shrink-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               ))}
             </div>
+            <Button type="button" onClick={addMember} variant="secondary" className="rounded-full mt-1">
+              <Plus className="h-4 w-4 mr-1" /> Add member
+            </Button>
           </div>
         </div>
 

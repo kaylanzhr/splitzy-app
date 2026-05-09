@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export type Member = { id: string; name: string; emoji: string };
+export type Member = { id: string; name: string; emoji: string; email?: string };
 export type Expense = {
   id: string;
   groupId: string;
@@ -19,9 +19,7 @@ export type Group = {
   currency: string;
 };
 
-export type Settings = {
-  n8nWebhookUrl: string;
-};
+export type Settings = Record<string, never>;
 
 const KEY = "splitzy:v1";
 
@@ -82,7 +80,7 @@ const seed = (): Store => {
       },
     ],
     activeGroupId: groupId,
-    settings: { n8nWebhookUrl: "" },
+    settings: {},
   };
 };
 
@@ -127,18 +125,31 @@ export function useStore() {
 }
 
 export const actions = {
-  addGroup(name: string, emoji: string, memberNames: string[]) {
+  addGroup(name: string, emoji: string, memberInputs: { name: string; email?: string }[], yourEmail?: string) {
     const emojis = ["🦊", "🐼", "🦄", "🐯", "🐸", "🦁", "🐨", "🦖"];
-    const members: Member[] = memberNames.map((n, i) => ({
-      id: crypto.randomUUID(),
-      name: n,
-      emoji: emojis[i % emojis.length],
-    }));
+    const members: Member[] = memberInputs
+      .filter((m) => m.name.trim())
+      .map((m, i) => ({
+        id: crypto.randomUUID(),
+        name: m.name.trim(),
+        emoji: emojis[i % emojis.length],
+        email: m.email?.trim() || undefined,
+      }));
     // Always include "You"
-    members.unshift({ id: crypto.randomUUID(), name: "You", emoji: "😎" });
+    members.unshift({ id: crypto.randomUUID(), name: "You", emoji: "😎", email: yourEmail?.trim() || undefined });
     const g: Group = { id: crypto.randomUUID(), name, emoji, currency: "€", members };
     setStore((s) => ({ ...s, groups: [...s.groups, g], activeGroupId: g.id }));
     return g;
+  },
+  updateMemberEmails(groupId: string, emails: Record<string, string>) {
+    setStore((s) => ({
+      ...s,
+      groups: s.groups.map((g) =>
+        g.id === groupId
+          ? { ...g, members: g.members.map((m) => ({ ...m, email: emails[m.id]?.trim() || m.email })) }
+          : g,
+      ),
+    }));
   },
   setActiveGroup(id: string) {
     setStore((s) => ({ ...s, activeGroupId: id }));

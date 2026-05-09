@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -37,13 +37,15 @@ export function AddExpenseDialog({
   const [paidBy, setPaidBy] = useState(group.members[0]?.id || "");
   const [splitWith, setSplitWith] = useState<string[]>(group.members.map((m) => m.id));
 
-  function reset() {
-    setDesc("");
-    setAmount("");
-    setEmoji("💸");
-    setPaidBy(group.members[0]?.id || "");
-    setSplitWith(group.members.map((m) => m.id));
-  }
+  useEffect(() => {
+    if (open) {
+      setDesc("");
+      setAmount("");
+      setEmoji("💸");
+      setPaidBy(group.members[0]?.id || "");
+      setSplitWith(group.members.map((m) => m.id));
+    }
+  }, [open, group.id]);
 
   function submit() {
     const amt = parseFloat(amount);
@@ -56,12 +58,11 @@ export function AddExpenseDialog({
       splitWith,
       emoji,
     });
-    reset();
     onOpenChange(false);
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) reset(); }}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md rounded-3xl">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">Add an expense</DialogTitle>
