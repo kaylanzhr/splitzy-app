@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { actions, computeBalances, settleUp, useStore, type Group } from "@/lib/splitzy-store";
+import { actions, computeBalances, formatMoney, settleUp, useStore, type Group } from "@/lib/splitzy-store";
 import { Send, Mail } from "lucide-react";
 import { toast } from "sonner";
 
