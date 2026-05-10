@@ -316,6 +316,7 @@ export function Dashboard() {
       <NewGroupDialog open={newGroupOpen} onOpenChange={setNewGroupOpen} />
       <SendSummaryDialog open={summaryOpen} onOpenChange={setSummaryOpen} group={group} />
       <RecordPaymentDialog open={payOpen} onOpenChange={setPayOpen} group={group} preset={payPreset} />
+      <EditMembersDialog open={editMembersOpen} onOpenChange={setEditMembersOpen} group={group} />
     </div>
   );
 }
