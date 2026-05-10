@@ -269,7 +269,7 @@ export function Dashboard() {
               ) : (
                 <div className="space-y-2">
                   {txns.map((t, i) => (
-                    <div key={i} className="rounded-xl bg-card/70 backdrop-blur px-3 py-2.5 text-sm space-y-2">
+                    <div key={i} className="rounded-xl bg-secondary/40 px-3 py-2.5 text-sm space-y-2">
                       <div className="flex items-center justify-between">
                         <span>
                           <b>{t.from.name}</b> → <b>{t.to.name}</b>
