@@ -259,10 +259,10 @@ export function Dashboard() {
               </div>
             </div>
 
-            <div className="rounded-3xl bg-gradient-mint p-5 shadow-soft">
+            <div className="rounded-3xl bg-card border border-border p-5">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-4 w-4 text-mint-foreground" />
-                <h3 className="font-display text-lg font-bold text-mint-foreground">Settle up</h3>
+                <Sparkles className="h-4 w-4 text-primary" />
+                <h3 className="font-display text-lg font-bold">Settle up</h3>
               </div>
               {txns.length === 0 ? (
                 <p className="text-sm text-mint-foreground/80">All squared up! 🎉</p>
