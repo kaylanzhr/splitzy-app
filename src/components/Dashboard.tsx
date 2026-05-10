@@ -265,7 +265,7 @@ export function Dashboard() {
                 <h3 className="font-display text-lg font-bold">Settle up</h3>
               </div>
               {txns.length === 0 ? (
-                <p className="text-sm text-mint-foreground/80">All squared up! 🎉</p>
+                <p className="text-sm text-muted-foreground">All squared up! 🎉</p>
               ) : (
                 <div className="space-y-2">
                   {txns.map((t, i) => (
