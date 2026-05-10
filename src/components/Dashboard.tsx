@@ -122,7 +122,7 @@ export function Dashboard() {
               <Send className="h-4 w-4 mr-1.5" /> Send summary
             </Button>
             <Button
-              className="rounded-full bg-gradient-warm text-primary-foreground shadow-soft"
+              className="rounded-full"
               onClick={() => {
                 setEditing(null);
                 setAddOpen(true);
