@@ -32,6 +32,7 @@ export function Dashboard() {
   const [newGroupOpen, setNewGroupOpen] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
+  const [editMembersOpen, setEditMembersOpen] = useState(false);
   const [payPreset, setPayPreset] = useState<{ fromId: string; toId: string; amount: number } | null>(null);
 
   const group: Group | undefined =
