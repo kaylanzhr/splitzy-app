@@ -129,7 +129,7 @@ export function SendSummaryDialog({
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={send} className="bg-gradient-warm text-primary-foreground rounded-full px-6">
+          <Button onClick={send} className="rounded-full px-6">
             <Send className="h-4 w-4 mr-1.5" /> Send notifications
           </Button>
         </DialogFooter>

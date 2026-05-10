@@ -122,7 +122,7 @@ export function Dashboard() {
               <Send className="h-4 w-4 mr-1.5" /> Send summary
             </Button>
             <Button
-              className="rounded-full bg-gradient-warm text-primary-foreground shadow-soft"
+              className="rounded-full"
               onClick={() => {
                 setEditing(null);
                 setAddOpen(true);
@@ -259,17 +259,17 @@ export function Dashboard() {
               </div>
             </div>
 
-            <div className="rounded-3xl bg-gradient-mint p-5 shadow-soft">
+            <div className="rounded-3xl bg-card border border-border p-5">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-4 w-4 text-mint-foreground" />
-                <h3 className="font-display text-lg font-bold text-mint-foreground">Settle up</h3>
+                <Sparkles className="h-4 w-4 text-primary" />
+                <h3 className="font-display text-lg font-bold">Settle up</h3>
               </div>
               {txns.length === 0 ? (
-                <p className="text-sm text-mint-foreground/80">All squared up! 🎉</p>
+                <p className="text-sm text-muted-foreground">All squared up! 🎉</p>
               ) : (
                 <div className="space-y-2">
                   {txns.map((t, i) => (
-                    <div key={i} className="rounded-xl bg-card/70 backdrop-blur px-3 py-2.5 text-sm space-y-2">
+                    <div key={i} className="rounded-xl bg-secondary/40 px-3 py-2.5 text-sm space-y-2">
                       <div className="flex items-center justify-between">
                         <span>
                           <b>{t.from.name}</b> → <b>{t.to.name}</b>
@@ -312,14 +312,20 @@ export function Dashboard() {
 function StatCard({ label, value, tone }: { label: string; value: string; tone: "card" | "warm" | "mint" | "sun" }) {
   const tones = {
     card: "bg-card border border-border",
-    warm: "bg-gradient-warm text-primary-foreground",
-    mint: "bg-gradient-mint text-mint-foreground",
-    sun: "bg-sun text-sun-foreground",
+    warm: "bg-card border border-border",
+    mint: "bg-card border border-border",
+    sun: "bg-card border border-border",
+  };
+  const valueTone = {
+    card: "text-foreground",
+    warm: "text-primary",
+    mint: "text-mint-foreground",
+    sun: "text-foreground",
   };
   return (
-    <div className={`rounded-3xl p-5 shadow-soft ${tones[tone]}`}>
-      <div className="text-xs font-semibold opacity-80">{label}</div>
-      <div className="font-display font-extrabold text-3xl mt-1 break-words">{value}</div>
+    <div className={`rounded-3xl p-5 ${tones[tone]}`}>
+      <div className="text-xs font-semibold text-muted-foreground">{label}</div>
+      <div className={`font-display font-extrabold text-3xl mt-1 break-words ${valueTone[tone]}`}>{value}</div>
     </div>
   );
 }
