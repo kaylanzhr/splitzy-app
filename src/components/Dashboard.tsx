@@ -11,11 +11,12 @@ import {
   type Group,
 } from "@/lib/splitzy-store";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, ChevronDown, Send, Users, Sparkles, Pencil, CheckCircle2, ArrowRight } from "lucide-react";
+import { Plus, Trash2, ChevronDown, Send, Users, Sparkles, Pencil, CheckCircle2, ArrowRight, UserCog } from "lucide-react";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 import { NewGroupDialog } from "./NewGroupDialog";
 import { SendSummaryDialog } from "./SendSummaryDialog";
 import { RecordPaymentDialog } from "./RecordPaymentDialog";
+import { EditMembersDialog } from "./EditMembersDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
