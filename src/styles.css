@@ -48,46 +48,46 @@
 :root {
   --radius: 1rem;
 
-  /* warm cream background */
-  --background: oklch(0.985 0.018 80);
-  --foreground: oklch(0.22 0.04 35);
+  /* deep warm dark background */
+  --background: oklch(0.18 0.02 35);
+  --foreground: oklch(0.96 0.02 80);
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.04 35);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.04 35);
+  --card: oklch(0.23 0.025 35);
+  --card-foreground: oklch(0.96 0.02 80);
+  --popover: oklch(0.23 0.025 35);
+  --popover-foreground: oklch(0.96 0.02 80);
 
   /* coral / sunset primary */
-  --primary: oklch(0.7 0.18 35);
-  --primary-foreground: oklch(0.99 0.01 80);
+  --primary: oklch(0.78 0.17 40);
+  --primary-foreground: oklch(0.18 0.02 35);
 
-  --secondary: oklch(0.95 0.03 60);
-  --secondary-foreground: oklch(0.28 0.05 35);
+  --secondary: oklch(0.28 0.03 35);
+  --secondary-foreground: oklch(0.96 0.02 80);
 
-  --muted: oklch(0.96 0.015 75);
-  --muted-foreground: oklch(0.5 0.03 50);
+  --muted: oklch(0.26 0.02 35);
+  --muted-foreground: oklch(0.72 0.03 60);
 
-  --accent: oklch(0.93 0.05 50);
-  --accent-foreground: oklch(0.28 0.05 35);
+  --accent: oklch(0.32 0.05 40);
+  --accent-foreground: oklch(0.96 0.02 80);
 
   /* fresh mint for "you're owed" */
-  --mint: oklch(0.82 0.13 165);
-  --mint-foreground: oklch(0.25 0.06 165);
+  --mint: oklch(0.55 0.13 165);
+  --mint-foreground: oklch(0.95 0.05 165);
 
   /* warm sunny yellow */
-  --sun: oklch(0.88 0.14 90);
-  --sun-foreground: oklch(0.28 0.06 60);
+  --sun: oklch(0.82 0.14 90);
+  --sun-foreground: oklch(0.2 0.05 60);
 
-  --destructive: oklch(0.62 0.22 25);
+  --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.99 0.01 80);
 
-  --border: oklch(0.9 0.02 70);
-  --input: oklch(0.92 0.02 70);
-  --ring: oklch(0.7 0.18 35);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.78 0.17 40);
 
-  --gradient-warm: linear-gradient(135deg, oklch(0.85 0.14 60) 0%, oklch(0.78 0.17 35) 50%, oklch(0.72 0.18 15) 100%);
-  --gradient-mint: linear-gradient(135deg, oklch(0.88 0.11 165) 0%, oklch(0.78 0.14 175) 100%);
-  --gradient-cream: linear-gradient(180deg, oklch(0.985 0.018 80) 0%, oklch(0.96 0.04 60) 100%);
+  --gradient-warm: linear-gradient(135deg, oklch(0.78 0.14 60) 0%, oklch(0.7 0.17 35) 50%, oklch(0.62 0.18 15) 100%);
+  --gradient-mint: linear-gradient(135deg, oklch(0.6 0.12 165) 0%, oklch(0.5 0.13 175) 100%);
+  --gradient-cream: linear-gradient(180deg, oklch(0.18 0.02 35) 0%, oklch(0.22 0.03 25) 100%);
 }
 
 .dark {
