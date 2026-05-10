@@ -312,14 +312,20 @@ export function Dashboard() {
 function StatCard({ label, value, tone }: { label: string; value: string; tone: "card" | "warm" | "mint" | "sun" }) {
   const tones = {
     card: "bg-card border border-border",
-    warm: "bg-gradient-warm text-primary-foreground",
-    mint: "bg-gradient-mint text-mint-foreground",
-    sun: "bg-sun text-sun-foreground",
+    warm: "bg-card border border-border",
+    mint: "bg-card border border-border",
+    sun: "bg-card border border-border",
+  };
+  const valueTone = {
+    card: "text-foreground",
+    warm: "text-primary",
+    mint: "text-mint-foreground",
+    sun: "text-foreground",
   };
   return (
-    <div className={`rounded-3xl p-5 shadow-soft ${tones[tone]}`}>
-      <div className="text-xs font-semibold opacity-80">{label}</div>
-      <div className="font-display font-extrabold text-3xl mt-1 break-words">{value}</div>
+    <div className={`rounded-3xl p-5 ${tones[tone]}`}>
+      <div className="text-xs font-semibold text-muted-foreground">{label}</div>
+      <div className={`font-display font-extrabold text-3xl mt-1 break-words ${valueTone[tone]}`}>{value}</div>
     </div>
   );
 }
