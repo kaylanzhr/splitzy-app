@@ -11,11 +11,12 @@ import {
   type Group,
 } from "@/lib/splitzy-store";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, ChevronDown, Send, Users, Sparkles, Pencil, CheckCircle2, ArrowRight } from "lucide-react";
+import { Plus, Trash2, ChevronDown, Send, Users, Sparkles, Pencil, CheckCircle2, ArrowRight, UserCog } from "lucide-react";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 import { NewGroupDialog } from "./NewGroupDialog";
 import { SendSummaryDialog } from "./SendSummaryDialog";
 import { RecordPaymentDialog } from "./RecordPaymentDialog";
+import { EditMembersDialog } from "./EditMembersDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +32,7 @@ export function Dashboard() {
   const [newGroupOpen, setNewGroupOpen] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
+  const [editMembersOpen, setEditMembersOpen] = useState(false);
   const [payPreset, setPayPreset] = useState<{ fromId: string; toId: string; amount: number } | null>(null);
 
   const group: Group | undefined =
@@ -95,6 +97,15 @@ export function Dashboard() {
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setTimeout(() => setEditMembersOpen(true), 0);
+                }}
+                className="gap-2"
+              >
+                <UserCog className="h-4 w-4" /> Edit members
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={(e) => {
                   e.preventDefault();
@@ -305,6 +316,7 @@ export function Dashboard() {
       <NewGroupDialog open={newGroupOpen} onOpenChange={setNewGroupOpen} />
       <SendSummaryDialog open={summaryOpen} onOpenChange={setSummaryOpen} group={group} />
       <RecordPaymentDialog open={payOpen} onOpenChange={setPayOpen} group={group} preset={payPreset} />
+      <EditMembersDialog open={editMembersOpen} onOpenChange={setEditMembersOpen} group={group} />
     </div>
   );
 }

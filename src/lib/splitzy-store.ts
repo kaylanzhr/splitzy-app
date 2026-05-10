@@ -169,17 +169,17 @@ export function useStore() {
 }
 
 export const actions = {
-  addGroup(name: string, emoji: string, memberInputs: { name: string; email?: string }[], yourEmail?: string) {
-    const emojis = ["🦊", "🐼", "🦄", "🐯", "🐸", "🦁", "🐨", "🦖"];
+  addGroup(name: string, emoji: string, memberInputs: { name: string; email?: string; emoji?: string }[], yourEmail?: string, yourEmoji?: string) {
+    const fallbacks = ["🦊", "🐼", "🦄", "🐯", "🐸", "🦁", "🐨", "🦖"];
     const members: Member[] = memberInputs
       .filter((m) => m.name.trim())
       .map((m, i) => ({
         id: crypto.randomUUID(),
         name: m.name.trim(),
-        emoji: emojis[i % emojis.length],
+        emoji: m.emoji || fallbacks[i % fallbacks.length],
         email: m.email?.trim() || undefined,
       }));
-    members.unshift({ id: crypto.randomUUID(), name: "You", emoji: "😎", email: yourEmail?.trim() || undefined });
+    members.unshift({ id: crypto.randomUUID(), name: "You", emoji: yourEmoji || "😎", email: yourEmail?.trim() || undefined });
     const g: Group = { id: crypto.randomUUID(), name, emoji, currency: "Rp ", members };
     setStore((s) => ({ ...s, groups: [...s.groups, g], activeGroupId: g.id }));
     return g;
@@ -190,6 +190,28 @@ export const actions = {
       groups: s.groups.map((g) =>
         g.id === groupId
           ? { ...g, members: g.members.map((m) => ({ ...m, email: emails[m.id]?.trim() || m.email })) }
+          : g,
+      ),
+    }));
+  },
+  updateMembers(groupId: string, patch: Record<string, Partial<Pick<Member, "name" | "emoji" | "email">>>) {
+    setStore((s) => ({
+      ...s,
+      groups: s.groups.map((g) =>
+        g.id === groupId
+          ? {
+              ...g,
+              members: g.members.map((m) =>
+                patch[m.id]
+                  ? {
+                      ...m,
+                      ...(patch[m.id].name !== undefined ? { name: patch[m.id].name!.trim() || m.name } : {}),
+                      ...(patch[m.id].emoji ? { emoji: patch[m.id].emoji! } : {}),
+                      ...(patch[m.id].email !== undefined ? { email: patch[m.id].email?.trim() || undefined } : {}),
+                    }
+                  : m,
+              ),
+            }
           : g,
       ),
     }));

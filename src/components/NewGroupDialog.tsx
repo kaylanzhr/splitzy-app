@@ -10,17 +10,59 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { actions } from "@/lib/splitzy-store";
 import { X, Plus } from "lucide-react";
 
-const EMOJIS = ["🌊", "🏔️", "🏠", "🍕", "🎉", "✈️", "🎬", "🚗", "🎓", "💼"];
+const GROUP_EMOJIS = ["🌊", "🏔️", "🏠", "🍕", "🎉", "✈️", "🎬", "🚗", "🎓", "💼"];
+const MEMBER_EMOJIS = [
+  "😎", "🦊", "🐼", "🦄", "🐯", "🐸", "🦁", "🐨", "🦖", "🐵",
+  "🐰", "🐻", "🦉", "🐺", "🐙", "🦋", "🐢", "🦩", "🐳", "🐧",
+  "👩", "👨", "🧑", "👧", "👦", "🧙", "🦸", "🧞", "🥷", "🤖",
+];
 
-type MemberInput = { name: string; email: string };
+type MemberInput = { name: string; email: string; emoji: string };
 
 const initialMembers = (): MemberInput[] => [
-  { name: "Alex", email: "" },
-  { name: "Sam", email: "" },
+  { name: "Alex", email: "", emoji: "🦊" },
+  { name: "Sam", email: "", emoji: "🐼" },
 ];
+
+function EmojiPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="h-10 w-10 shrink-0 rounded-xl bg-secondary hover:bg-accent text-xl flex items-center justify-center"
+          aria-label="Pick emoji"
+        >
+          {value}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-2" align="start">
+        <div className="grid grid-cols-6 gap-1">
+          {MEMBER_EMOJIS.map((e) => (
+            <button
+              key={e}
+              type="button"
+              onClick={() => {
+                onChange(e);
+                setOpen(false);
+              }}
+              className={`h-9 w-9 rounded-lg text-lg transition ${
+                e === value ? "bg-primary/20 ring-2 ring-primary" : "hover:bg-accent"
+              }`}
+            >
+              {e}
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 export function NewGroupDialog({
   open,
@@ -32,6 +74,7 @@ export function NewGroupDialog({
   const [name, setName] = useState("");
   const [emoji, setEmoji] = useState("🎉");
   const [yourEmail, setYourEmail] = useState("");
+  const [yourEmoji, setYourEmoji] = useState("😎");
   const [members, setMembers] = useState<MemberInput[]>(initialMembers());
 
   useEffect(() => {
@@ -39,12 +82,14 @@ export function NewGroupDialog({
       setName("");
       setEmoji("🎉");
       setYourEmail("");
+      setYourEmoji("😎");
       setMembers(initialMembers());
     }
   }, [open]);
 
   function addMember() {
-    setMembers((m) => [...m, { name: "", email: "" }]);
+    const fallbacks = ["🦊", "🐼", "🦄", "🐯", "🐸", "🦁", "🐨", "🦖"];
+    setMembers((m) => [...m, { name: "", email: "", emoji: fallbacks[m.length % fallbacks.length] }]);
   }
 
   function updateMember(i: number, patch: Partial<MemberInput>) {
@@ -57,7 +102,7 @@ export function NewGroupDialog({
 
   function submit() {
     if (!name.trim()) return;
-    actions.addGroup(name.trim(), emoji, members, yourEmail);
+    actions.addGroup(name.trim(), emoji, members, yourEmail, yourEmoji);
     onOpenChange(false);
   }
 
@@ -76,15 +121,15 @@ export function NewGroupDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Emoji</Label>
+            <Label>Group emoji</Label>
             <div className="flex flex-wrap gap-1.5">
-              {EMOJIS.map((e) => (
+              {GROUP_EMOJIS.map((e) => (
                 <button
                   type="button"
                   key={e}
                   onClick={() => setEmoji(e)}
                   className={`h-10 w-10 rounded-xl text-xl transition ${
-                    emoji === e ? "bg-primary/15 ring-2 ring-primary" : "bg-secondary hover:bg-accent"
+                    emoji === e ? "bg-primary/20 ring-2 ring-primary" : "bg-secondary hover:bg-accent"
                   }`}
                 >
                   {e}
@@ -94,13 +139,17 @@ export function NewGroupDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Your email <span className="text-muted-foreground font-normal">(optional)</span></Label>
-            <Input
-              type="email"
-              value={yourEmail}
-              onChange={(e) => setYourEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
+            <Label>You</Label>
+            <div className="flex gap-2 items-start">
+              <EmojiPicker value={yourEmoji} onChange={setYourEmoji} />
+              <Input
+                type="email"
+                value={yourEmail}
+                onChange={(e) => setYourEmail(e.target.value)}
+                placeholder="your email (optional)"
+                className="flex-1"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -108,6 +157,7 @@ export function NewGroupDialog({
             <div className="space-y-2">
               {members.map((m, i) => (
                 <div key={i} className="flex gap-2 items-start">
+                  <EmojiPicker value={m.emoji} onChange={(e) => updateMember(i, { emoji: e })} />
                   <Input
                     value={m.name}
                     onChange={(e) => updateMember(i, { name: e.target.value })}
@@ -118,8 +168,8 @@ export function NewGroupDialog({
                     type="email"
                     value={m.email}
                     onChange={(e) => updateMember(i, { email: e.target.value })}
-                    placeholder="email (optional)"
-                    className="flex-[1.3]"
+                    placeholder="email"
+                    className="flex-[1.2]"
                   />
                   <Button
                     type="button"
