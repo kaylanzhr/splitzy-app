@@ -100,6 +100,15 @@ export function Dashboard() {
               <DropdownMenuItem
                 onSelect={(e) => {
                   e.preventDefault();
+                  setTimeout(() => setEditMembersOpen(true), 0);
+                }}
+                className="gap-2"
+              >
+                <UserCog className="h-4 w-4" /> Edit members
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
                   setTimeout(() => setNewGroupOpen(true), 0);
                 }}
                 className="gap-2"
