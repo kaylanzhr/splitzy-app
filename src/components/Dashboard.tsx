@@ -17,6 +17,7 @@ import { NewGroupDialog } from "./NewGroupDialog";
 import { SendSummaryDialog } from "./SendSummaryDialog";
 import { RecordPaymentDialog } from "./RecordPaymentDialog";
 import { EditMembersDialog } from "./EditMembersDialog";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,9 +64,12 @@ export function Dashboard() {
     <div className="min-h-screen">
       <header className="container mx-auto flex items-center justify-between gap-4 px-6 py-6">
         <Logo />
-        <Link to="/">
-          <Button variant="ghost" className="rounded-full text-sm">Home</Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Link to="/">
+            <Button variant="ghost" className="rounded-full text-sm">Home</Button>
+          </Link>
+        </div>
       </header>
 
       <main className="container mx-auto px-6 pb-20">
