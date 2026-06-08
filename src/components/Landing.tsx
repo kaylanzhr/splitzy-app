@@ -43,7 +43,7 @@ export function Landing() {
         <div className="space-y-7">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-xs font-semibold text-muted-foreground">
             <Sparkles className="h-3.5 w-3.5 text-primary" />
-            Now with email notifications
+            Split bills with zero stress
           </div>
           <h1 className="font-display text-5xl font-extrabold leading-[1.05] tracking-tight md:text-7xl">
             Split smarter,
@@ -118,7 +118,7 @@ export function Landing() {
           <p className="mt-3 text-muted-foreground text-lg">Money stuff shouldn't ruin good vibes. Here's what you get.</p>
         </div>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          <Benefit icon={<Smile className="h-5 w-5" />} title="No more awkward asks" text="Auto-summaries do the chasing for you. Friendships stay friendships." />
+          <Benefit icon={<Smile className="h-5 w-5" />} title="No more awkward asks" text="Clear balance summaries do the explaining for you. Friendships stay friendships." />
           <Benefit icon={<Zap className="h-5 w-5" />} title="Lightning fast" text="Add an expense in under 10 seconds. Edit anytime if you fat-finger a digit." />
           <Benefit icon={<PiggyBank className="h-5 w-5" />} title="See where it goes" text="Trip totals, per-person spend, and clear settle-up paths at a glance." />
           <Benefit icon={<ShieldCheck className="h-5 w-5" />} title="Track real payments" text="Mark debts paid as soon as they're settled — mid-trip or after." />
@@ -134,7 +134,7 @@ export function Landing() {
             {[
               { n: "01", t: "Create a group", d: "Name it, pick an emoji, add your people." },
               { n: "02", t: "Drop in expenses", d: "Each time someone pays, log it. Splitzy does the rest." },
-              { n: "03", t: "Get the summary", d: "See balances, settle up, email the group in one tap." },
+              { n: "03", t: "Settle up", d: "See balances, record payments, and close the loop in one tap." },
             ].map((s) => (
               <div key={s.n} className="space-y-3">
                 <div className="font-display text-5xl font-extrabold text-primary">{s.n}</div>
@@ -177,7 +177,7 @@ export function Landing() {
           {[
             { q: "Saved our group chat from spreadsheet chaos. We actually settle up now.", n: "Maya", r: "Bali trip, 6 friends" },
             { q: "I edited a typo three months later. No drama. Chef's kiss.", n: "Reza", r: "Flatshare, 4 people" },
-            { q: "The email summary is a game-changer. Everyone just pays.", n: "Anya", r: "Dinner club, 8 friends" },
+            { q: "The settle-up tracker is a game-changer. Everyone just pays.", n: "Anya", r: "Dinner club, 8 friends" },
           ].map((t) => (
             <div key={t.n} className="rounded-3xl bg-card border border-border p-6">
               <p className="text-base leading-relaxed">"{t.q}"</p>
@@ -203,7 +203,7 @@ export function Landing() {
         <div className="grid gap-4 md:grid-cols-2">
           {[
             { q: "Is Splitzy free?", a: "Yep. Every core feature — groups, expenses, settle-up, summaries — is free." },
-            { q: "Do my friends need an account?", a: "Nope. Just add their name and email. Summaries land in their inbox." },
+            { q: "Do my friends need an account?", a: "Nope. Just add their name and emoji. Everyone sees the same balances instantly." },
             { q: "What currency does it use?", a: "Indonesian Rupiah (IDR), formatted with proper thousand separators." },
             { q: "Can I edit a past expense?", a: "Of course. Tap the pencil icon on any entry to fix typos or amounts." },
           ].map((f) => (
