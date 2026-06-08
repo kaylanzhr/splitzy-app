@@ -19,7 +19,7 @@ const MEMBER_EMOJIS = [
   "👩", "👨", "🧑", "👧", "👦", "🧙", "🦸", "🧞", "🥷", "🤖",
 ];
 
-type Draft = { name: string; emoji: string; email: string };
+type Draft = { name: string; emoji: string };
 
 export function EditMembersDialog({
   open,
@@ -36,7 +36,7 @@ export function EditMembersDialog({
     if (open) {
       const d: Record<string, Draft> = {};
       group.members.forEach((m) => {
-        d[m.id] = { name: m.name, emoji: m.emoji, email: m.email || "" };
+        d[m.id] = { name: m.name, emoji: m.emoji };
       });
       setDrafts(d);
     }
@@ -56,12 +56,12 @@ export function EditMembersDialog({
       <DialogContent className="sm:max-w-md rounded-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">Edit members</DialogTitle>
-          <DialogDescription>Customize each member's emoji, name, and email.</DialogDescription>
+          <DialogDescription>Customize each member's emoji and name.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3">
           {group.members.map((m) => {
-            const d = drafts[m.id] || { name: m.name, emoji: m.emoji, email: m.email || "" };
+            const d = drafts[m.id] || { name: m.name, emoji: m.emoji };
             return (
               <div key={m.id} className="space-y-2 rounded-2xl border border-border p-3">
                 <div className="flex gap-2 items-start">
@@ -95,15 +95,6 @@ export function EditMembersDialog({
                     value={d.name}
                     onChange={(e) => update(m.id, { name: e.target.value })}
                     className="flex-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">Email</Label>
-                  <Input
-                    type="email"
-                    value={d.email}
-                    onChange={(e) => update(m.id, { email: e.target.value })}
-                    placeholder="optional"
                   />
                 </div>
               </div>
