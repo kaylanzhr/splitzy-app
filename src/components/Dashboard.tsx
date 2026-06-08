@@ -11,10 +11,9 @@ import {
   type Group,
 } from "@/lib/splitzy-store";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, ChevronDown, Send, Users, Sparkles, Pencil, CheckCircle2, ArrowRight, UserCog } from "lucide-react";
+import { Plus, Trash2, ChevronDown, Users, Sparkles, Pencil, CheckCircle2, ArrowRight, UserCog } from "lucide-react";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 import { NewGroupDialog } from "./NewGroupDialog";
-import { SendSummaryDialog } from "./SendSummaryDialog";
 import { RecordPaymentDialog } from "./RecordPaymentDialog";
 import { EditMembersDialog } from "./EditMembersDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -31,7 +30,6 @@ export function Dashboard() {
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
   const [newGroupOpen, setNewGroupOpen] = useState(false);
-  const [summaryOpen, setSummaryOpen] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
   const [editMembersOpen, setEditMembersOpen] = useState(false);
   const [payPreset, setPayPreset] = useState<{ fromId: string; toId: string; amount: number } | null>(null);
@@ -132,9 +130,6 @@ export function Dashboard() {
               }}
             >
               <CheckCircle2 className="h-4 w-4 mr-1.5" /> Record payment
-            </Button>
-            <Button variant="outline" className="rounded-full" onClick={() => setSummaryOpen(true)}>
-              <Send className="h-4 w-4 mr-1.5" /> Send summary
             </Button>
             <Button
               className="rounded-full"
@@ -318,7 +313,6 @@ export function Dashboard() {
         expense={editing}
       />
       <NewGroupDialog open={newGroupOpen} onOpenChange={setNewGroupOpen} />
-      <SendSummaryDialog open={summaryOpen} onOpenChange={setSummaryOpen} group={group} />
       <RecordPaymentDialog open={payOpen} onOpenChange={setPayOpen} group={group} preset={payPreset} />
       <EditMembersDialog open={editMembersOpen} onOpenChange={setEditMembersOpen} group={group} />
     </div>

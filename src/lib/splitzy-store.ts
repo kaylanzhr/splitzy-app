@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export type Member = { id: string; name: string; emoji: string; email?: string };
+export type Member = { id: string; name: string; emoji: string };
 export type Expense = {
   id: string;
   groupId: string;
@@ -169,7 +169,7 @@ export function useStore() {
 }
 
 export const actions = {
-  addGroup(name: string, emoji: string, memberInputs: { name: string; email?: string; emoji?: string }[], yourEmail?: string, yourEmoji?: string) {
+  addGroup(name: string, emoji: string, memberInputs: { name: string; emoji?: string }[], yourEmoji?: string) {
     const fallbacks = ["🦊", "🐼", "🦄", "🐯", "🐸", "🦁", "🐨", "🦖"];
     const members: Member[] = memberInputs
       .filter((m) => m.name.trim())
@@ -177,24 +177,13 @@ export const actions = {
         id: crypto.randomUUID(),
         name: m.name.trim(),
         emoji: m.emoji || fallbacks[i % fallbacks.length],
-        email: m.email?.trim() || undefined,
       }));
-    members.unshift({ id: crypto.randomUUID(), name: "You", emoji: yourEmoji || "😎", email: yourEmail?.trim() || undefined });
+    members.unshift({ id: crypto.randomUUID(), name: "You", emoji: yourEmoji || "😎" });
     const g: Group = { id: crypto.randomUUID(), name, emoji, currency: "Rp ", members };
     setStore((s) => ({ ...s, groups: [...s.groups, g], activeGroupId: g.id }));
     return g;
   },
-  updateMemberEmails(groupId: string, emails: Record<string, string>) {
-    setStore((s) => ({
-      ...s,
-      groups: s.groups.map((g) =>
-        g.id === groupId
-          ? { ...g, members: g.members.map((m) => ({ ...m, email: emails[m.id]?.trim() || m.email })) }
-          : g,
-      ),
-    }));
-  },
-  updateMembers(groupId: string, patch: Record<string, Partial<Pick<Member, "name" | "emoji" | "email">>>) {
+  updateMembers(groupId: string, patch: Record<string, Partial<Pick<Member, "name" | "emoji">>>) {
     setStore((s) => ({
       ...s,
       groups: s.groups.map((g) =>
@@ -207,7 +196,6 @@ export const actions = {
                       ...m,
                       ...(patch[m.id].name !== undefined ? { name: patch[m.id].name!.trim() || m.name } : {}),
                       ...(patch[m.id].emoji ? { emoji: patch[m.id].emoji! } : {}),
-                      ...(patch[m.id].email !== undefined ? { email: patch[m.id].email?.trim() || undefined } : {}),
                     }
                   : m,
               ),
