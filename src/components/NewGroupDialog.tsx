@@ -21,11 +21,11 @@ const MEMBER_EMOJIS = [
   "👩", "👨", "🧑", "👧", "👦", "🧙", "🦸", "🧞", "🥷", "🤖",
 ];
 
-type MemberInput = { name: string; email: string; emoji: string };
+type MemberInput = { name: string; emoji: string };
 
 const initialMembers = (): MemberInput[] => [
-  { name: "Alex", email: "", emoji: "🦊" },
-  { name: "Sam", email: "", emoji: "🐼" },
+  { name: "Alex", emoji: "🦊" },
+  { name: "Sam", emoji: "🐼" },
 ];
 
 function EmojiPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -73,7 +73,6 @@ export function NewGroupDialog({
 }) {
   const [name, setName] = useState("");
   const [emoji, setEmoji] = useState("🎉");
-  const [yourEmail, setYourEmail] = useState("");
   const [yourEmoji, setYourEmoji] = useState("😎");
   const [members, setMembers] = useState<MemberInput[]>(initialMembers());
 
@@ -81,7 +80,6 @@ export function NewGroupDialog({
     if (open) {
       setName("");
       setEmoji("🎉");
-      setYourEmail("");
       setYourEmoji("😎");
       setMembers(initialMembers());
     }
@@ -89,7 +87,7 @@ export function NewGroupDialog({
 
   function addMember() {
     const fallbacks = ["🦊", "🐼", "🦄", "🐯", "🐸", "🦁", "🐨", "🦖"];
-    setMembers((m) => [...m, { name: "", email: "", emoji: fallbacks[m.length % fallbacks.length] }]);
+    setMembers((m) => [...m, { name: "", emoji: fallbacks[m.length % fallbacks.length] }]);
   }
 
   function updateMember(i: number, patch: Partial<MemberInput>) {
@@ -102,7 +100,7 @@ export function NewGroupDialog({
 
   function submit() {
     if (!name.trim()) return;
-    actions.addGroup(name.trim(), emoji, members, yourEmail, yourEmoji);
+    actions.addGroup(name.trim(), emoji, members, yourEmoji);
     onOpenChange(false);
   }
 
@@ -142,13 +140,9 @@ export function NewGroupDialog({
             <Label>You</Label>
             <div className="flex gap-2 items-start">
               <EmojiPicker value={yourEmoji} onChange={setYourEmoji} />
-              <Input
-                type="email"
-                value={yourEmail}
-                onChange={(e) => setYourEmail(e.target.value)}
-                placeholder="your email (optional)"
-                className="flex-1"
-              />
+              <div className="flex items-center h-10 px-3 rounded-xl bg-secondary text-sm text-muted-foreground flex-1">
+                You
+              </div>
             </div>
           </div>
 
@@ -163,13 +157,6 @@ export function NewGroupDialog({
                     onChange={(e) => updateMember(i, { name: e.target.value })}
                     placeholder="Name"
                     className="flex-1"
-                  />
-                  <Input
-                    type="email"
-                    value={m.email}
-                    onChange={(e) => updateMember(i, { email: e.target.value })}
-                    placeholder="email"
-                    className="flex-[1.2]"
                   />
                   <Button
                     type="button"
