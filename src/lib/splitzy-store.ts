@@ -183,17 +183,7 @@ export const actions = {
     setStore((s) => ({ ...s, groups: [...s.groups, g], activeGroupId: g.id }));
     return g;
   },
-  updateMemberEmails(groupId: string, emails: Record<string, string>) {
-    setStore((s) => ({
-      ...s,
-      groups: s.groups.map((g) =>
-        g.id === groupId
-          ? { ...g, members: g.members.map((m) => ({ ...m, email: emails[m.id]?.trim() || m.email })) }
-          : g,
-      ),
-    }));
-  },
-  updateMembers(groupId: string, patch: Record<string, Partial<Pick<Member, "name" | "emoji" | "email">>>) {
+  updateMembers(groupId: string, patch: Record<string, Partial<Pick<Member, "name" | "emoji">>>) {
     setStore((s) => ({
       ...s,
       groups: s.groups.map((g) =>
@@ -206,7 +196,6 @@ export const actions = {
                       ...m,
                       ...(patch[m.id].name !== undefined ? { name: patch[m.id].name!.trim() || m.name } : {}),
                       ...(patch[m.id].emoji ? { emoji: patch[m.id].emoji! } : {}),
-                      ...(patch[m.id].email !== undefined ? { email: patch[m.id].email?.trim() || undefined } : {}),
                     }
                   : m,
               ),
