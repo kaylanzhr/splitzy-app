@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiPublicSendNotificationRouteImport } from './routes/api/public/send-notification'
+import { Route as ApiPublicSendReminderRouteImport } from './routes/api/public/send-reminder'
 
 const AppRoute = AppRouteImport.update({
   id: '/app',
@@ -23,41 +23,40 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicSendNotificationRoute =
-  ApiPublicSendNotificationRouteImport.update({
-    id: '/api/public/send-notification',
-    path: '/api/public/send-notification',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+const ApiPublicSendReminderRoute = ApiPublicSendReminderRouteImport.update({
+  id: '/api/public/send-reminder',
+  path: '/api/public/send-reminder',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
-  '/api/public/send-notification': typeof ApiPublicSendNotificationRoute
+  '/api/public/send-reminder': typeof ApiPublicSendReminderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
-  '/api/public/send-notification': typeof ApiPublicSendNotificationRoute
+  '/api/public/send-reminder': typeof ApiPublicSendReminderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRoute
-  '/api/public/send-notification': typeof ApiPublicSendNotificationRoute
+  '/api/public/send-reminder': typeof ApiPublicSendReminderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/api/public/send-notification'
+  fullPaths: '/' | '/app' | '/api/public/send-reminder'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app' | '/api/public/send-notification'
-  id: '__root__' | '/' | '/app' | '/api/public/send-notification'
+  to: '/' | '/app' | '/api/public/send-reminder'
+  id: '__root__' | '/' | '/app' | '/api/public/send-reminder'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRoute
-  ApiPublicSendNotificationRoute: typeof ApiPublicSendNotificationRoute
+  ApiPublicSendReminderRoute: typeof ApiPublicSendReminderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -76,11 +75,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/send-notification': {
-      id: '/api/public/send-notification'
-      path: '/api/public/send-notification'
-      fullPath: '/api/public/send-notification'
-      preLoaderRoute: typeof ApiPublicSendNotificationRouteImport
+    '/api/public/send-reminder': {
+      id: '/api/public/send-reminder'
+      path: '/api/public/send-reminder'
+      fullPath: '/api/public/send-reminder'
+      preLoaderRoute: typeof ApiPublicSendReminderRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -89,7 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRoute,
-  ApiPublicSendNotificationRoute: ApiPublicSendNotificationRoute,
+  ApiPublicSendReminderRoute: ApiPublicSendReminderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

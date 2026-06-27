@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
-import { ContactForm } from "@/components/ContactForm";
+
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
@@ -216,8 +216,7 @@ export function Landing() {
         </div>
       </section>
 
-      {/* Contact */}
-      <ContactForm />
+
 
       {/* CTA */}
       <section className="container mx-auto px-6 py-20">

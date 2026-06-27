@@ -11,7 +11,8 @@ import {
   type Group,
 } from "@/lib/splitzy-store";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, ChevronDown, Users, Sparkles, Pencil, CheckCircle2, ArrowRight, UserCog } from "lucide-react";
+import { Plus, Trash2, ChevronDown, Users, Sparkles, Pencil, CheckCircle2, ArrowRight, UserCog, Bell, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 import { NewGroupDialog } from "./NewGroupDialog";
 import { RecordPaymentDialog } from "./RecordPaymentDialog";
@@ -278,27 +279,42 @@ export function Dashboard() {
                 <p className="text-sm text-muted-foreground">All squared up! 🎉</p>
               ) : (
                 <div className="space-y-2">
-                  {txns.map((t, i) => (
-                    <div key={i} className="rounded-xl bg-secondary/40 px-3 py-2.5 text-sm space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span>
-                          <b>{t.from.name}</b> → <b>{t.to.name}</b>
-                        </span>
-                        <span className="font-display font-bold">{formatMoney(t.amount, group.currency)}</span>
+                  {txns.map((t, i) => {
+                    const lastExp = [...groupExpenses]
+                      .reverse()
+                      .find((e) => e.splitWith.includes(t.from.id));
+                    return (
+                      <div key={i} className="rounded-xl bg-secondary/40 px-3 py-2.5 text-sm space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span>
+                            <b>{t.from.name}</b> → <b>{t.to.name}</b>
+                          </span>
+                          <span className="font-display font-bold">{formatMoney(t.amount, group.currency)}</span>
+                        </div>
+                        <div className="flex gap-2">
+                          <ReminderButton
+                            fromName={t.from.name}
+                            toName={t.to.name}
+                            amount={formatMoney(t.amount, group.currency)}
+                            groupName={group.name}
+                            activity={lastExp?.description}
+                            splitWays={lastExp?.splitWith.length}
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 rounded-full h-7 text-xs"
+                            onClick={() => {
+                              setPayPreset({ fromId: t.from.id, toId: t.to.id, amount: t.amount });
+                              setPayOpen(true);
+                            }}
+                          >
+                            <CheckCircle2 className="h-3 w-3 mr-1" /> Mark as paid
+                          </Button>
+                        </div>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full rounded-full h-7 text-xs"
-                        onClick={() => {
-                          setPayPreset({ fromId: t.from.id, toId: t.to.id, amount: t.amount });
-                          setPayOpen(true);
-                        }}
-                      >
-                        <CheckCircle2 className="h-3 w-3 mr-1" /> Mark as paid
-                      </Button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -352,3 +368,77 @@ function EmptyExpenses({ onAdd }: { onAdd: () => void }) {
     </div>
   );
 }
+
+function ReminderButton({
+  fromName,
+  toName,
+  amount,
+  groupName,
+  activity,
+  splitWays,
+}: {
+  fromName: string;
+  toName: string;
+  amount: string;
+  groupName: string;
+  activity?: string;
+  splitWays?: number;
+}) {
+  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  async function send() {
+    setState("sending");
+    try {
+      const res = await fetch("/api/public/send-reminder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fromName,
+          toName,
+          amount,
+          groupName,
+          activity,
+          splitWays,
+          status: "Unpaid",
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) throw new Error(data.message || "Failed");
+      setState("sent");
+      toast.success(`Reminder sent to ${fromName} (demo: delivered to admin)`);
+      setTimeout(() => setState("idle"), 3000);
+    } catch (err) {
+      console.error(err);
+      setState("error");
+      toast.error("Failed to send reminder");
+      setTimeout(() => setState("idle"), 3000);
+    }
+  }
+
+  const label =
+    state === "sending"
+      ? "Sending..."
+      : state === "sent"
+        ? "Reminder sent"
+        : state === "error"
+          ? "Failed, retry"
+          : "Send reminder";
+
+  return (
+    <Button
+      size="sm"
+      variant={state === "sent" ? "secondary" : "default"}
+      className="flex-1 rounded-full h-7 text-xs"
+      disabled={state === "sending"}
+      onClick={send}
+    >
+      {state === "sending" ? (
+        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+      ) : (
+        <Bell className="h-3 w-3 mr-1" />
+      )}
+      {label}
+    </Button>
+  );
+}
+
