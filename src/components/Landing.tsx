@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
+import { ContactForm } from "@/components/ContactForm";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
