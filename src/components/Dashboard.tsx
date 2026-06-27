@@ -368,3 +368,77 @@ function EmptyExpenses({ onAdd }: { onAdd: () => void }) {
     </div>
   );
 }
+
+function ReminderButton({
+  fromName,
+  toName,
+  amount,
+  groupName,
+  activity,
+  splitWays,
+}: {
+  fromName: string;
+  toName: string;
+  amount: string;
+  groupName: string;
+  activity?: string;
+  splitWays?: number;
+}) {
+  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  async function send() {
+    setState("sending");
+    try {
+      const res = await fetch("/api/public/send-reminder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fromName,
+          toName,
+          amount,
+          groupName,
+          activity,
+          splitWays,
+          status: "Unpaid",
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) throw new Error(data.message || "Failed");
+      setState("sent");
+      toast.success(`Reminder sent to ${fromName} (demo: delivered to admin)`);
+      setTimeout(() => setState("idle"), 3000);
+    } catch (err) {
+      console.error(err);
+      setState("error");
+      toast.error("Failed to send reminder");
+      setTimeout(() => setState("idle"), 3000);
+    }
+  }
+
+  const label =
+    state === "sending"
+      ? "Sending..."
+      : state === "sent"
+        ? "Reminder sent"
+        : state === "error"
+          ? "Failed, retry"
+          : "Send reminder";
+
+  return (
+    <Button
+      size="sm"
+      variant={state === "sent" ? "secondary" : "default"}
+      className="flex-1 rounded-full h-7 text-xs"
+      disabled={state === "sending"}
+      onClick={send}
+    >
+      {state === "sending" ? (
+        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+      ) : (
+        <Bell className="h-3 w-3 mr-1" />
+      )}
+      {label}
+    </Button>
+  );
+}
+
