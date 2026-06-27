@@ -216,8 +216,7 @@ export function Landing() {
         </div>
       </section>
 
-      {/* Contact */}
-      <ContactForm />
+
 
       {/* CTA */}
       <section className="container mx-auto px-6 py-20">
